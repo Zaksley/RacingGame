@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManage : MonoBehaviour
 {
+    public float RespawnTimer = 1f; 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,5 +20,15 @@ public class GameManage : MonoBehaviour
         {
             SceneManager.LoadScene("SampleScene"); 
         }
+    }
+
+    public void ReloadScene() 
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void ReloadSceneDelay(float seconds)
+    {
+        Invoke("ReloadScene", seconds); 
     }
 }
