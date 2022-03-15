@@ -6,7 +6,9 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
     // Start is called before the first frame update
-    public float speed = 1500f; 
+    public float speedMax = 15000f; 
+    public float speedAcceleration = 300f; 
+    public float speedBrake = 800f;
     public float rotationSpeed = 15f; 
     private float movement = 0f; 
     private float rotation = 0f; 
@@ -18,13 +20,35 @@ public class CarController : MonoBehaviour
     void Start()
     {   
         rb = GetComponent<Rigidbody2D>(); 
+        speedMax = -speedMax;
     }
 
     // Update is called once per frame
     void Update()
     {
-        movement = -Input.GetAxisRaw("Vertical") * speed; 
+        
         rotation = Input.GetAxisRaw("Horizontal"); 
+
+        // if previously 0, start motor with speed
+
+        /*
+        if (movement == 0f) 
+        {
+            movement = -Input.GetAxisRaw("Vertical") * speed;
+        }
+        else 
+        {
+            movement += -Input.GetAxisRaw("Vertical") * incrSpeed * Time.deltaTime; 
+        }
+        */
+
+        // Acceleration and brake
+        if (-Input.GetAxisRaw("Vertical") == -1f)       movement += -Input.GetAxisRaw("Vertical") * speedAcceleration * Time.deltaTime;
+        else if (-Input.GetAxisRaw("Vertical") == 1f)   movement += -Input.GetAxisRaw("Vertical") * speedBrake * Time.deltaTime;
+        
+        // Controls motor
+        if (movement > 0)   movement = 0;
+        if (movement <= speedMax) movement = speedMax; 
     }
 
     void FixedUpdate() {
@@ -33,6 +57,9 @@ public class CarController : MonoBehaviour
         {
             backWheel.useMotor = false; 
             frontWheel.useMotor = false; 
+            JointMotor2D motor = new JointMotor2D { motorSpeed = movement, maxMotorTorque = backWheel.motor.maxMotorTorque }; 
+            backWheel.motor = motor; 
+            frontWheel.motor = motor; 
         }
         else 
         {
