@@ -11,6 +11,15 @@ public class CarController : MonoBehaviour
     private bool move; 
     private bool isGrounded; 
 
+    
+    [SerializeField] private GameObject wheelFront; 
+    [SerializeField] private GameObject wheelBack; 
+    [SerializeField] private float rotationWheel; 
+
+    private Vector3 lastPosition; 
+    private Vector3 newPosition; 
+    private Vector3 velocity;
+
 
     private float rotation = 0f; 
     [SerializeField] private float rotationSpeed = 2f; 
@@ -20,6 +29,8 @@ public class CarController : MonoBehaviour
     void Start()
     {   
         rb = GetComponent<Rigidbody2D>(); 
+        lastPosition = rb.transform.position; 
+        newPosition = lastPosition; 
     }
 
     void Update()
@@ -38,12 +49,33 @@ public class CarController : MonoBehaviour
         if (move && isGrounded)
         {
             rb.AddForce(transform.right * speed * Time.fixedDeltaTime * 100f, ForceMode2D.Force); 
+
+
         }
 
         if (rotation != 0) 
         {
             rb.AddTorque(rotation * rotationSpeed * rotationSpeed * Time.fixedDeltaTime * 100f, ForceMode2D.Force);
         }
+
+
+        // Rotate wheels 
+        newPosition = rb.transform.position; 
+        velocity = newPosition - lastPosition; 
+
+        if (velocity.x > 0)  
+        {
+            wheelBack.transform.Rotate(0f, 0f, -rotationWheel, Space.Self);
+            wheelFront.transform.Rotate(0f, 0f, -rotationWheel, Space.Self);
+        }
+        else if (velocity.x < 0) 
+        {
+            wheelBack.transform.Rotate(0f, 0f, rotationWheel, Space.Self);
+            wheelFront.transform.Rotate(0f, 0f, rotationWheel, Space.Self);
+        }
+
+        lastPosition = newPosition; 
+
 
     }
 
